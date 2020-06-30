@@ -2,14 +2,15 @@
 # 1527936
 # CIS 2348: Final Project
 
+import sys
 import csv
 import operator
 
-
 user_input = ''
 
+
 # Get filename from user
-def get_file():
+def get_filename():
     global user_input
     while user_input != 'upload':
         try:
@@ -17,31 +18,33 @@ def get_file():
             if ".csv" not in filename:
                 raise ValueError('Please include ".csv" file extension.')
 
+
         except ValueError as excpt:
             print(excpt)
-            print('Could not upload.\n')
+            print('Might not upload.\n')
 
         user_input = input("Enter any key to try again ('upload' to quit): ")
     return filename
 
 
-# OBJ 1: Processed Inventory Reports:
-
-# OBJ 1a. Define function to print FullInventory.csv
-def print_inventory():
+def process_inventory(file):
     try:
-        # Read FullInventory.csv
-        with open(get_file(), 'r') as csvfile:
-            csv_reader = csv.reader(csvfile, delimiter=',')
+        with open(file) as csvfile:
+            data = csv.reader(csvfile, delimiter=',')
+            sorted_list = sorted(data, key=operator.itemgetter(1))
 
-            # Print in this order >>> item ID, Manufacturer name, Item type, Service date, Status
-            print('\n')
-            print("{:<12} {:<15} {:<14} {:<10} {:<17} {:<15}".format('Item ID', 'Manufacturer', 'Item type', 'Price',
-                                                                     'Service Date', 'Status'))
-            for eachrow in csv_reader:
-                print("{:<12} {:<15} {:<14} {:<10} {:<17} {:<15}".format(*eachrow))
+        with open('FullInventory.csv', 'w') as f:
+            csv_writer = csv.writer(f)
+            for row in sorted_list:
+                csv_writer.writerow(row)
+
+
     except FileNotFoundError:
-        print("File not found.")
+        print("Filename: '{}' not found.".format(file))
+
+
+# OBJ 1: PROCESSED INVENTORY REPORTS:
+# OBJ 1a. Define function to write over FullInventory.csv file with inputted csv files
 
 
 # OBJ 1b. TODO: write each row in LaptopInventory.csv to their own .txt file.
@@ -51,4 +54,7 @@ def print_inventory():
 
 
 if __name__ == '__main__':
-    print_inventory()
+    print("Welcome to ManageManage\n")
+
+    file = get_filename()
+    process_inventory(file)
